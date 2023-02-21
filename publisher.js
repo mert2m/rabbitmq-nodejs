@@ -5,7 +5,7 @@ const message = {
 const data = require("./data.json")
 const queueName = process.argv[2] || "jobsQueue";
 
-connect_rabbitmq();
+connect();
 
 async function connect_rabbitmq() {
   try {
