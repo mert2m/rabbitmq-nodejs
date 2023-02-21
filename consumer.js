@@ -11,7 +11,8 @@ async function connect_rabbitmq() {
     const connection = await amqp.connect("amqp://localhost:5672");
     const channel = await connection.createChannel();
     const assertion = await channel.assertQueue(queueName);
-
+    const redis = require("redis")
+    const client = redis.createClient();
     // Mesajın Alınması...
     console.log("Mesaj bekleniyor...");
     channel.consume(queueName, message => {
@@ -20,7 +21,13 @@ async function connect_rabbitmq() {
         const userInfo = data.find(u => u.id == messageInfo.description)
         if(userInfo){
             console.log("İşlenen Kayıt", userInfo);
-            channel.ack(message);
+            client.set('user_${userInfo.id}', JSON.stringify(userInfo), 
+            (err, status) => {
+              if(!err){
+              console.log("Status",status);
+              channel.ack(message);
+
+             }})
         }
     });
   } catch (error) {
